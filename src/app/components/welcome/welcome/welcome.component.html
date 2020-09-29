@@ -5,7 +5,7 @@
         Room Code:
         <input [(ngModel)]="roomCode">
       </label>
-      <button mat-raised-button color="primary" [disabled]="roomCode == ''" (click)="submitCode()">Submit</button>
+      <button mat-raised-button color="primary" [disabled]="roomCode === ''" (click)="submitCode()">Submit</button>
       <p *ngIf="error">Room Code not valid</p>
     </div>
   </mat-tab>

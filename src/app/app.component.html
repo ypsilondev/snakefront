@@ -3,7 +3,7 @@
   <span class="space"></span>
   <span>
     {{ con.getRoomCode() }}
-    <mat-icon>content_copy</mat-icon>
+    <mat-icon *ngIf="con.getRoomCode() !== ''">content_copy</mat-icon>
   </span>
   <span class="space"></span>
   <span><mat-icon>close</mat-icon></span>
