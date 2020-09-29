@@ -8,10 +8,12 @@ import {MatToolbarModule} from '@angular/material/toolbar';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {FormsModule} from '@angular/forms';
+import { WelcomeComponent } from './components/welcome/welcome/welcome.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    WelcomeComponent
   ],
   imports: [
     BrowserModule,
