@@ -12,6 +12,9 @@ import { WelcomeComponent } from './components/welcome/welcome/welcome.component
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
 import { GameComponent } from './components/game/game/game.component';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://zjuliany.me:3000', options: {} };
 
 @NgModule({
   declarations: [
@@ -28,7 +31,8 @@ import { GameComponent } from './components/game/game/game.component';
     MatIconModule,
     FormsModule,
     MatTabsModule,
-    MatButtonModule
+    MatButtonModule,
+    SocketIoModule.forRoot(config)
   ],
   providers: [],
   bootstrap: [AppComponent]

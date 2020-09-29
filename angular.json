@@ -126,5 +126,8 @@
       }
     }
   },
-  "defaultProject": "SnakeOnlineFront"
+  "defaultProject": "SnakeOnlineFront",
+  "cli": {
+    "analytics": "f58b3db9-a0b3-46f8-8cd8-9f389c7845f7"
+  }
 }
