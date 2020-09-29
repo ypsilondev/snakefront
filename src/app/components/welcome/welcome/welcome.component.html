@@ -1,1 +1,17 @@
-
+<mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+  <mat-tab label="Enter by room code">
+    <div class="tabContainer">
+      <label>
+        Room Code:
+        <input [(ngModel)]="roomCode">
+      </label>
+      <button mat-raised-button color="primary" [disabled]="roomCode == ''" (click)="submitCode()">Submit</button>
+      <p *ngIf="error">Room Code not valid</p>
+    </div>
+  </mat-tab>
+  <mat-tab label="Create room">
+    <div class="tabContainer">
+      <button mat-raised-button color="primary" (click)="createRoom()">Create Room</button>
+    </div>
+  </mat-tab>
+</mat-tab-group>
