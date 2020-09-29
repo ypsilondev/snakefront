@@ -11,11 +11,13 @@ import {FormsModule} from '@angular/forms';
 import { WelcomeComponent } from './components/welcome/welcome/welcome.component';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
+import { GameComponent } from './components/game/game/game.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    GameComponent
   ],
   imports: [
     BrowserModule,
