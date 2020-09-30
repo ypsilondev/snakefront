@@ -155,22 +155,20 @@ export class GameComponent implements OnInit {
       this.y = newLog.y;
     }
     ctx.beginPath();
-    let first = true;
-    let second = false;
+    let i = 0;
     this.locations.forEach(loc => {
-      if (first) {
+      if (i === 0) {
         ctx.moveTo(loc.x, loc.y);
-        first = false;
       } else {
         ctx.lineTo(loc.x, loc.y);
-        if (second) {
+        if (i >= 3) {
           const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
           if (diff <= this.velocity) {
             this.cs.setColor("red");
           }
         }
-        second = true;
       }
+      i++;
     });
     ctx.strokeStyle = this.cs.getColor();
     ctx.stroke();
