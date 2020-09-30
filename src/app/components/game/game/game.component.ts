@@ -59,6 +59,7 @@ export class GameComponent implements OnInit {
             setTimeout(() => {
               this.countdown--;
               this.locations.forEach((value, key) => {
+                console.log(key, value);
                 for (let i = 0; i < this.stringLength / this.velocity; i++) {
                   value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
                 }
@@ -70,12 +71,14 @@ export class GameComponent implements OnInit {
             }, 1000);
           }, 1000);
         } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
+          console.log(game);
           this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
           this.increaseLength.set(game.payload.id, 0);
         } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
           this.increaseLength.set(game.payload.id, game.payload.value);
         } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
           this.locations.set(game.payload.id, game.payload.data);
+          console.log(game);
         }
       });
       this.cs.subscribeMovements().subscribe(movements => {
@@ -98,8 +101,8 @@ export class GameComponent implements OnInit {
 
     let frameCount = 0;
     setInterval(() => {
-      frameCount++;
       if (!this.preRunning && !this.ifCountdown) {
+        frameCount++;
         ctx.clearRect(0, 0, this.width, this.height);
         ctx.beginPath();
         ctx.arc(this.coinX, this.coinY, 6, 0, Math.PI * 2);
@@ -119,9 +122,9 @@ export class GameComponent implements OnInit {
         this.map.forEach((value, key) => {
           this.move(ctx, value.positions, key);
         });
-      }
-      if (frameCount%60 === 0) {
-        this.cs.sendPosition(this.locations.get(this.cs.getId()));
+        if (frameCount%60 === 0) {
+          this.cs.sendPosition(this.locations.get(this.cs.getId()));
+        }
       }
 
     }, 17);
