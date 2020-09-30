@@ -208,9 +208,12 @@ export class GameComponent implements OnInit {
 
   setOwnDir(dir: string): void {
     const entry = this.map.get(this.cs.getId());
+    const locOld = entry.positions;
     entry.positions = dir;
-    this.map.set(this.cs.getId(), entry);
-    this.cs.sendMovement(dir);
+    if (locOld !== dir) {
+      this.map.set(this.cs.getId(), entry);
+      this.cs.sendMovement(dir);
+    }
   }
 
 }
