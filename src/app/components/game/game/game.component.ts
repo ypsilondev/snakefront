@@ -10,8 +10,6 @@ import {Router} from '@angular/router';
 export class GameComponent implements OnInit {
   private width = 1400;
   private height = 800;
-  // private x = Math.random() * this.width;
-  // private y = Math.random() * this.height;
   private stringLength = 10;
   private velocity = 2;
   preRunning = true;
@@ -22,8 +20,6 @@ export class GameComponent implements OnInit {
   private increaseLength = new Map<number, number>();
   private map = new Map<number, {color: string, positions: string}>();
   private locations = new Map<number, [{x: number, y: number}]>();
-  private isUsed = false;
-  private count = 0;
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
