@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Socket} from "ngx-socket-io";
-import {Observable} from "rxjs";
+import {Observable, Subscriber} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ export class ConnectionService {
 
   private id = 0;
   private roomCode = "";
-  private connectObservable;
+  private connectObservable: Subscriber<{event, roomCode, state, code, id, roomSettings: {velocity, players}}>;
   private movement: Observable<JSON>;
   private players;
   private velocity;
@@ -30,20 +30,29 @@ export class ConnectionService {
   }
 
   public subscribeMovements(): Observable<JSON> {
-    return this.movement;
+    return this.socket.fromEvent("movement");
   }
 
-  public createNewRoom(velocity: number, players: number): Observable<void> {
+  public subscribeGame(): Observable<{ message, payload }> {
+    return this.socket.fromEvent("game");
+  }
+
+  public createNewRoom(velocity: number, players: number): Observable<{event
+    , roomCode, state, code, id, roomSettings: {velocity, players}}> {
     this.socket.emit("register", {velocity, players});
-    this.connectObservable = new Observable();
-    return this.connectObservable;
+    const self = this;
+    return new Observable<{event, roomCode, state, code, id, roomSettings: {velocity, players}}>(subscriber => {
+      self.connectObservable = subscriber;
+    });
   }
 
-  public setRoomCode(code: string): Observable<void> {
+  public setRoomCode(code: string): Observable<{event, roomCode, state, code, id, roomSettings: {velocity, players}}> {
     this.roomCode = code;
     this.socket.emit("join", code);
-    this.connectObservable = new Observable();
-    return this.connectObservable;
+    const self = this;
+    return new Observable<{event, roomCode, state, code, id, roomSettings: {velocity, players}}>(subscriber => {
+      self.connectObservable = subscriber;
+    });
   }
 
   getVelocity(): number {
@@ -62,7 +71,8 @@ export class ConnectionService {
         self.id = resp.id;
         self.players = resp.roomSettings.players;
         self.velocity = resp.roomSettings.velocity;
-        self.connectObservable.submit();
+        self.connectObservable.next(resp);
+        self.connectObservable.complete();
       }
     });
     this.socket.fromEvent("broadcast").subscribe(resp => {
