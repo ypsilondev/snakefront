@@ -5,6 +5,9 @@
         Room Code:
         <input [(ngModel)]="roomCode">
       </label>
+      <br><br>
+      <input type="color" [(ngModel)]="color">
+      <br><br>
       <button mat-raised-button color="primary" [disabled]="roomCode === ''" (click)="submitCode()">Submit</button>
       <p *ngIf="error">Room Code not valid</p>
     </div>
@@ -20,6 +23,9 @@
         Snake speed:
         <input type="number" min="1" max="10" value="2" [(ngModel)]="snakeSpeed">
       </label>
+      <br><br>
+      <input type="color" [(ngModel)]="color">
+      <br><br>
     </div>
     <div class="tabContainer">
       <button mat-raised-button color="primary" (click)="createRoom()">Create Room</button>

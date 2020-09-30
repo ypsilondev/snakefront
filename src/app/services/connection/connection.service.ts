@@ -13,6 +13,7 @@ export class ConnectionService {
   private movement: Observable<JSON>;
   private players;
   private velocity;
+  private color = "white";
 
   constructor(private socket: Socket) {
     this.registerChannels();
@@ -22,15 +23,23 @@ export class ConnectionService {
     return this.roomCode;
   }
 
+  public getColor(): string {
+    return this.color;
+  }
+
+  public setColor(color: string): void {
+    this.color = color;
+  }
+
   public sendMovement(data: []): void {
-    this.socket.emit("movement", {id: this.id, payload: data});
+    this.socket.emit("movement", {id: this.id, payload: {color: this.color, positions: data}});
   }
 
   public getId(): number {
     return this.id;
   }
 
-  public subscribeMovements(): Observable<{id: number, payload: [{x: number, y: number}]}> {
+  public subscribeMovements(): Observable<{id: number, payload: {color: string, positions: [{x: number, y: number}]}}> {
     return this.socket.fromEvent("movement");
   }
 

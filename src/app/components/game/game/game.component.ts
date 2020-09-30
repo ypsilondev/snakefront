@@ -23,7 +23,7 @@ export class GameComponent implements OnInit {
   private coinY = 0;
   private locations;
   private increaseLength = 0;
-  private map = new Map<number, [{x: number, y: number}]>();
+  private map = new Map<number, {color: string, positions: [{x: number, y: number}]}>();
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
@@ -161,27 +161,33 @@ export class GameComponent implements OnInit {
         first = false;
       } else {
         ctx.lineTo(loc.x, loc.y);
+        const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+        if (diff <= this.velocity) {
+          this.cs.setColor("red");
+        }
       }
     });
+    ctx.strokeColor = this.cs.getColor();
     ctx.stroke();
     this.map.forEach((value, key) => {
       ctx.beginPath();
       let first2 = true;
-      value.forEach(loc => {
+      value.positions.forEach(loc => {
         if (first2) {
           ctx.moveTo(loc.x, loc.y);
           first2 = false;
         } else {
           ctx.lineTo(loc.x, loc.y);
         }
+        const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+        if (diff <= this.velocity) {
+          this.cs.setColor("red");
+        }
       });
+      ctx.strokeColor = value.color;
       ctx.stroke();
     });
     this.cs.sendMovement(this.locations);
-  }
-
-  setOwnDirection(dir: string): void {
-
   }
 
 }

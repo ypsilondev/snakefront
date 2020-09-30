@@ -13,6 +13,7 @@ export class WelcomeComponent implements OnInit {
   error = false;
   players = 2;
   snakeSpeed = 2;
+  color = "#ffffff";
 
   constructor(public ss: SettingsService, public cs: ConnectionService, private router: Router) { }
 
@@ -21,7 +22,8 @@ export class WelcomeComponent implements OnInit {
 
   submitCode(): void {
     this.cs.setRoomCode(this.roomCode).subscribe(resp => {
-      if (resp.code !== 19) {
+      if (resp.code !== 19 && resp.code !== 18) {
+        this.cs.setColor(this.color);
         this.router.navigate(["game"]);
       } else {
         this.error = true;
