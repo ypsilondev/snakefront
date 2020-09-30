@@ -1,1 +1,5 @@
 <canvas id="snake" width="1400" height="800"></canvas>
+<div id="preRunning" *ngIf="ifCountdown || preRunning">
+  <h1 *ngIf="preRunning">Warte auf Spieler...</h1>
+  <h1 *ngIf="ifCountdown">{{ countdown }}</h1>
+</div>

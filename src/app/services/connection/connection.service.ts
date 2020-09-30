@@ -22,14 +22,15 @@ export class ConnectionService {
     return this.roomCode;
   }
 
-  public sendMovement(data: {x, y}): void {
-    // @ts-ignore
-    data.id = this.id;
-    console.log(data);
-    this.socket.emit("movement", data);
+  public sendMovement(data: []): void {
+    this.socket.emit("movement", {id: this.id, payload: data});
   }
 
-  public subscribeMovements(): Observable<JSON> {
+  public getId(): number {
+    return this.id;
+  }
+
+  public subscribeMovements(): Observable<{id: number, payload: [{x: number, y: number}]}> {
     return this.socket.fromEvent("movement");
   }
 
@@ -79,6 +80,10 @@ export class ConnectionService {
       console.log(resp);
     });
     this.movement = this.socket.fromEvent("movement");
+  }
+
+  setCoinCollected(): void {
+    this.socket.emit("game", {message: "coin collected", payload: {}});
   }
 
 }
