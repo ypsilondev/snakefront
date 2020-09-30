@@ -196,7 +196,10 @@ export class GameComponent implements OnInit {
             Math.pow(loc.y - this.locations.get(this.cs.getId())[0].y, 2));
           if (diff <= this.velocity) {
             console.log(diff);
-            this.cs.setColor("red");
+            const entry = this.map.get(this.cs.getId());
+            entry.color = "red";
+            this.cs.sendMovement(entry.positions, entry.color);
+            this.map.set(this.cs.getId(), entry);
           }
         }
       }
@@ -213,7 +216,7 @@ export class GameComponent implements OnInit {
     entry.positions = dir;
     if (locOld !== dir) {
       this.map.set(this.cs.getId(), entry);
-      this.cs.sendMovement(dir);
+      this.cs.sendMovement(dir, this.map.get(this.cs.getId()).color);
     }
   }
 

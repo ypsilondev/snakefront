@@ -31,8 +31,8 @@ export class ConnectionService {
     this.color = color;
   }
 
-  public sendMovement(dir: string): void {
-    this.socket.emit("movement", {id: this.id, payload: {color: this.color, positions: dir}});
+  public sendMovement(dir: string, color: string): void {
+    this.socket.emit("movement", {id: this.id, payload: {color, positions: dir}});
   }
 
   public sendIncLength(wallE: number): void {
