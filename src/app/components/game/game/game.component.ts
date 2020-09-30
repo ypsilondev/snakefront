@@ -25,6 +25,10 @@ export class GameComponent implements OnInit {
   constructor(public cs: ConnectionService, private router: Router) { }
 
   ngOnInit(): void {
+    if (!this.isNotSubscribed) {
+      return;
+    }
+    this.isNotSubscribed = false;
     if (this.cs.getRoomCode() === "") {
       this.router.navigate([""]);
     }
@@ -41,7 +45,7 @@ export class GameComponent implements OnInit {
     ctx.strokeStyle = 'white';
 
     this.velocity = this.cs.getVelocity();
-    if (this.isNotSubscribed) {
+    if (true) {
       this.isNotSubscribed = false;
       this.cs.subscribeGame().subscribe(game => {
         if (game.message === "Game Full") {
