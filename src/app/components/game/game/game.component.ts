@@ -191,7 +191,7 @@ export class GameComponent implements OnInit {
         ctx.moveTo(loc.x, loc.y);
       } else {
         ctx.lineTo(loc.x, loc.y);
-        if (!(id === this.cs.getId() && i >= 10)) {
+        if (!(id === this.cs.getId() && i < 10)) {
           const diff = Math.sqrt(Math.pow(loc.x - this.locations.get(this.cs.getId())[0].x, 2) +
             Math.pow(loc.y - this.locations.get(this.cs.getId())[0].y, 2));
           if (diff <= this.velocity) {
