@@ -33,15 +33,17 @@ export class ConnectionService {
     return this.movement;
   }
 
-  public createNewRoom(velocity: number, players: number, ready: Observable<void>): void {
-    this.connectObservable = ready;
+  public createNewRoom(velocity: number, players: number): Observable<void> {
     this.socket.emit("register", {velocity, players});
+    this.connectObservable = new Observable();
+    return this.connectObservable;
   }
 
-  public setRoomCode(code: string, ready: Observable<void>): void {
-    this.connectObservable = ready;
+  public setRoomCode(code: string): Observable<void> {
     this.roomCode = code;
     this.socket.emit("join", code);
+    this.connectObservable = new Observable();
+    return this.connectObservable;
   }
 
   getVelocity(): number {
