@@ -24,6 +24,7 @@ export class GameComponent implements OnInit {
   private locations;
   private increaseLength = 0;
   private map = new Map<number, {color: string, positions: [{x: number, y: number}]}>();
+  private isUsed = false;
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
@@ -65,7 +66,10 @@ export class GameComponent implements OnInit {
     });
     this.cs.subscribeMovements().subscribe(movements => {
       if (movements.id !== this.cs.getId()) {
+        while (this.isUsed) {}
+        this.isUsed = true;
         this.map.set(movements.id, movements.payload);
+        this.isUsed = false;
       }
     });
 
@@ -161,7 +165,7 @@ export class GameComponent implements OnInit {
         ctx.moveTo(loc.x, loc.y);
       } else {
         ctx.lineTo(loc.x, loc.y);
-        if (i >= 3) {
+        if (i >= 5) {
           const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
           if (diff <= this.velocity) {
             this.cs.setColor("red");
@@ -172,6 +176,8 @@ export class GameComponent implements OnInit {
     });
     ctx.strokeStyle = this.cs.getColor();
     ctx.stroke();
+    while (this.isUsed) {}
+    this.isUsed = true;
     this.map.forEach((value, key) => {
       ctx.beginPath();
       let first2 = true;
@@ -190,6 +196,7 @@ export class GameComponent implements OnInit {
       ctx.strokeStyle = value.color;
       ctx.stroke();
     });
+    this.isUsed = false;
     this.cs.sendMovement(this.locations);
   }
 
