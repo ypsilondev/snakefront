@@ -11,6 +11,17 @@
   </mat-tab>
   <mat-tab label="Create room">
     <div class="tabContainer">
+      <label>
+        Players:
+        <input type="number" min="1" max="10" value="2" [(ngModel)]="players">
+      </label>
+      <br><br>
+      <label>
+        Snake speed:
+        <input type="number" min="1" max="10" value="3" [(ngModel)]="snakeSpeed">
+      </label>
+    </div>
+    <div class="tabContainer">
       <button mat-raised-button color="primary" (click)="createRoom()">Create Room</button>
     </div>
   </mat-tab>

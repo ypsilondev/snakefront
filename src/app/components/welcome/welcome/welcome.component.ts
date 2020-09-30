@@ -9,6 +9,8 @@ import {SettingsService} from '../../../services/settings/settings.service';
 export class WelcomeComponent implements OnInit {
   roomCode = "";
   error = false;
+  players = 2;
+  snakeSpeed = 3;
 
   constructor(public ss: SettingsService) { }
 
