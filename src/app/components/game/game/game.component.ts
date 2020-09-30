@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {ConnectionService} from '../../../services/connection/connection.service';
-import {count} from 'rxjs/operators';
 import {Router} from '@angular/router';
 
 @Component({
@@ -11,7 +10,6 @@ import {Router} from '@angular/router';
 export class GameComponent implements OnInit {
   private width = 1400;
   private height = 800;
-  private direction = "down";
   private x = Math.random() * this.width;
   private y = Math.random() * this.height;
   private stringLength = 10;
@@ -21,9 +19,9 @@ export class GameComponent implements OnInit {
   ifCountdown = false;
   private coinX = 0;
   private coinY = 0;
-  private locations;
-  private increaseLength = 0;
-  private map = new Map<number, {color: string, positions: [{x: number, y: number}]}>();
+  private increaseLength = new Map<number, number>();
+  private map = new Map<number, {color: string, positions: string}>();
+  private locations = new Map<number, [{x: number, y: number}]>();
   private isUsed = false;
   private count = 0;
 
@@ -34,10 +32,8 @@ export class GameComponent implements OnInit {
       this.router.navigate([""]);
     }
 
-    this.locations = [{x: this.x, y: this.y}];
-    for (let i = 0; i < this.stringLength / this.velocity; i++) {
-      this.locations.push({x: this.x, y: this.y + this.velocity*(i+1)});
-    }
+    this.map.set(this.cs.getId(), {color: this.cs.getColor(), positions: "down"});
+    this.locations.set(this.cs.getId(), [{x: this.x, y: this.y}]);
 
     const snake = document.getElementById('snake') as HTMLCanvasElement;
     const ctx = snake.getContext('2d');
@@ -46,6 +42,7 @@ export class GameComponent implements OnInit {
     this.velocity = this.cs.getVelocity();
     this.cs.subscribeGame().subscribe(game => {
       if (game.message === "Game Full") {
+        this.cs.sendCord(this.x, this.y);
         this.preRunning = false;
       } else if (game.message === "Coin generated") {
         this.coinX = game.payload.x;
@@ -56,30 +53,37 @@ export class GameComponent implements OnInit {
           this.countdown--;
           setTimeout(() => {
             this.countdown--;
+            this.locations.forEach((value, key) => {
+              for (let i = 0; i < this.stringLength / this.velocity; i++) {
+                value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
+              }
+            });
             setTimeout(() => {
               this.countdown--;
               this.ifCountdown = false;
             }, 1000);
           }, 1000);
         }, 1000);
+      } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
+        this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
+        this.increaseLength.set(game.payload.id, 0);
+      } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
+        this.increaseLength.set(game.payload.id, game.payload.value);
       }
     });
     this.cs.subscribeMovements().subscribe(movements => {
       if (movements.id !== this.cs.getId()) {
-        while (this.isUsed) {}
-        this.isUsed = true;
         this.map.set(movements.id, movements.payload);
-        this.isUsed = false;
       }
     });
 
     document.addEventListener("keydown", e => {
       if (!this.preRunning && !this.ifCountdown) {
         switch (e.key) {
-          case "ArrowUp": if (this.direction !== "down") { this.direction = "up"; } break;
-          case "ArrowLeft": if (this.direction !== "right") { this.direction = "left"; } break;
-          case "ArrowDown": if (this.direction !== "up") { this.direction = "down"; } break;
-          case "ArrowRight": if (this.direction !== "left") { this.direction = "right"; } break;
+          case "ArrowUp": if (this.map.get(this.cs.getId()).positions !== "down") { this.setOwnDir("up"); } break;
+          case "ArrowLeft": if (this.map.get(this.cs.getId()).positions !== "right") { this.setOwnDir("left"); } break;
+          case "ArrowDown": if (this.map.get(this.cs.getId()).positions !== "up") { this.setOwnDir("down"); } break;
+          case "ArrowRight": if (this.map.get(this.cs.getId()).positions !== "left") { this.setOwnDir("right"); } break;
         }
       }
     });
@@ -95,72 +99,75 @@ export class GameComponent implements OnInit {
         const diff = Math.sqrt(Math.pow(this.coinX-this.x, 2) + Math.pow(this.coinY-this.y, 2));
         if (diff <= 6) {
           this.cs.setCoinCollected();
-          this.increaseLength += this.stringLength/this.velocity;
+          const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
+          this.increaseLength.set(this.cs.getId(), tmp);
+          this.cs.sendIncLength(tmp);
         }
-        this.move(ctx, this.direction);
+        this.map.forEach((value, key) => {
+          this.move(ctx, value.positions, key);
+        });
       }
     }, 17);
   }
 
-  move(ctx, dir: string): void {
+  move(ctx, dir: string, id: number): void {
     if (dir === "up") {
       if (this.y - this.stringLength - this.velocity > 0) {
-        this.drawNewLine(ctx,1);
+        this.drawNewLine(ctx,1, id);
       } else {
-        this.drawNewLine(ctx,0);
+        this.drawNewLine(ctx,0, id);
       }
     } else if (dir === "left") {
       if (this.x - this.stringLength - this.velocity > 0) {
-        this.drawNewLine(ctx, 2);
+        this.drawNewLine(ctx, 2, id);
       } else {
-        this.drawNewLine(ctx,0);
+        this.drawNewLine(ctx,0, id);
       }
     } else if (dir === "down") {
       if (this.y + this.stringLength + this.velocity < this.height) {
-        this.drawNewLine(ctx, 3);
+        this.drawNewLine(ctx, 3, id);
       } else {
-        this.drawNewLine(ctx, 0);
+        this.drawNewLine(ctx, 0, id);
       }
     } else if (dir === "right") {
       if (this.x + this.stringLength + this.velocity < this.width) {
-        this.drawNewLine(ctx, 4);
+        this.drawNewLine(ctx, 4, id);
       } else {
-        this.drawNewLine(ctx,0);
+        this.drawNewLine(ctx,0, id);
       }
     } else {
-      this.drawNewLine(ctx, 0);
+      this.drawNewLine(ctx, 0, id);
     }
   }
 
-  drawNewLine(ctx, upDown: number): void {
+  drawNewLine(ctx, upDown: number, id: number): void {
     let newLog;
+    const data = this.locations.get(id);
     switch (upDown) {
       case 1: {
-        newLog = {x: this.x, y: this.y - this.velocity};
+        newLog = {x: data[0].x, y: data[0].y - this.velocity};
       }       break;
       case 2: {
-        newLog = {x: this.x - this.velocity, y: this.y};
+        newLog = {x: data[0].x - this.velocity, y: data[0].y};
       }       break;
       case 3: {
-        newLog = {x: this.x, y: this.y + this.velocity};
+        newLog = {x: data[0].x, y: data[0].y + this.velocity};
       }       break;
       case 4: {
-        newLog = {x: this.x + this.velocity, y: this.y};
+        newLog = {x: data[0].x + this.velocity, y: data[0].y};
       }       break;
     }
     if (upDown !== 0) {
-      this.locations.unshift(newLog);
-      if (this.increaseLength <= 0) {
-        this.locations.pop();
+      data.unshift(newLog);
+      if (this.increaseLength.get(id) <= 0) {
+        data.pop();
       } else {
-        this.increaseLength--;
+        this.increaseLength.set(id, this.increaseLength.get(id)-1);
       }
-      this.x = newLog.x;
-      this.y = newLog.y;
     }
     ctx.beginPath();
     let i = 0;
-    this.locations.forEach(loc => {
+    data.forEach(loc => {
       if (i === 0) {
         ctx.moveTo(loc.x, loc.y);
       } else {
@@ -176,31 +183,13 @@ export class GameComponent implements OnInit {
     });
     ctx.strokeStyle = this.cs.getColor();
     ctx.stroke();
-    while (this.isUsed) {}
-    this.isUsed = true;
-    this.map.forEach((value, key) => {
-      ctx.beginPath();
-      let first2 = true;
-      value.positions.forEach(loc => {
-        if (first2) {
-          ctx.moveTo(loc.x, loc.y);
-          first2 = false;
-        } else {
-          ctx.lineTo(loc.x, loc.y);
-        }
-        const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
-        if (diff <= this.velocity) {
-          this.cs.setColor("red");
-        }
-      });
-      ctx.strokeStyle = value.color;
-      ctx.stroke();
-    });
-    this.isUsed = false;
-    this.count++;
-    if (this.count % 10 === 0) {
-      this.cs.sendMovement(this.locations);
-    }
+  }
+
+  setOwnDir(dir: string): void {
+    const entry = this.map.get(this.cs.getId());
+    entry.positions = dir;
+    this.map.set(this.cs.getId(), entry);
+    this.cs.sendMovement(dir);
   }
 
 }

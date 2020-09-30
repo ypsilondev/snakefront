@@ -31,15 +31,19 @@ export class ConnectionService {
     this.color = color;
   }
 
-  public sendMovement(data: []): void {
-    this.socket.emit("movement", {id: this.id, payload: {color: this.color, positions: data}});
+  public sendMovement(dir: string): void {
+    this.socket.emit("movement", {id: this.id, payload: {color: this.color, positions: dir}});
+  }
+
+  public sendIncLength(wallE: number): void {
+    this.socket.emit("game", {message: "incLength", payload: {id: this.id, value: wallE}});
   }
 
   public getId(): number {
     return this.id;
   }
 
-  public subscribeMovements(): Observable<{id: number, payload: {color: string, positions: [{x: number, y: number}]}}> {
+  public subscribeMovements(): Observable<{id: number, payload: {color: string, positions: string}}> {
     return this.socket.fromEvent("movement");
   }
 
@@ -71,6 +75,10 @@ export class ConnectionService {
 
   getMaxPlayers(): number {
     return this.players;
+  }
+
+  sendCord(x: number, y: number): void {
+    this.socket.emit("game", {message: "startCord", payload: {x, y, id: this.id}});
   }
 
   private registerChannels(): void {
