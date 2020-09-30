@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 export class GameComponent implements OnInit {
   private width = 1400;
   private height = 800;
-  private direction = "";
+  private direction = "down";
   private x = Math.random() * this.width;
   private y = Math.random() * this.height;
   private stringLength = 10;
@@ -25,6 +25,7 @@ export class GameComponent implements OnInit {
   private increaseLength = 0;
   private map = new Map<number, {color: string, positions: [{x: number, y: number}]}>();
   private isUsed = false;
+  private count = 0;
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
@@ -37,7 +38,6 @@ export class GameComponent implements OnInit {
     for (let i = 0; i < this.stringLength / this.velocity; i++) {
       this.locations.push({x: this.x, y: this.y + this.velocity*(i+1)});
     }
-
 
     const snake = document.getElementById('snake') as HTMLCanvasElement;
     const ctx = snake.getContext('2d');
@@ -197,7 +197,10 @@ export class GameComponent implements OnInit {
       ctx.stroke();
     });
     this.isUsed = false;
-    this.cs.sendMovement(this.locations);
+    this.count++;
+    if (this.count % 10 === 0) {
+      this.cs.sendMovement(this.locations);
+    }
   }
 
 }
