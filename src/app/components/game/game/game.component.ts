@@ -34,6 +34,7 @@ export class GameComponent implements OnInit {
 
     this.map.set(this.cs.getId(), {color: this.cs.getColor(), positions: "down"});
     this.locations.set(this.cs.getId(), [{x: this.x, y: this.y}]);
+    this.increaseLength.set(this.cs.getId(), 0);
 
     const snake = document.getElementById('snake') as HTMLCanvasElement;
     const ctx = snake.getContext('2d');
@@ -41,6 +42,7 @@ export class GameComponent implements OnInit {
 
     this.velocity = this.cs.getVelocity();
     this.cs.subscribeGame().subscribe(game => {
+      console.log(game);
       if (game.message === "Game Full") {
         this.cs.sendCord(this.x, this.y);
         this.preRunning = false;
@@ -65,6 +67,7 @@ export class GameComponent implements OnInit {
           }, 1000);
         }, 1000);
       } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
+        console.log(game);
         this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
         this.increaseLength.set(game.payload.id, 0);
       } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
@@ -96,7 +99,10 @@ export class GameComponent implements OnInit {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        const diff = Math.sqrt(Math.pow(this.coinX-this.x, 2) + Math.pow(this.coinY-this.y, 2));
+        const x = this.locations.get(this.cs.getId())[0].x;
+        const y = this.locations.get(this.cs.getId())[0].y;
+
+        const diff = Math.sqrt(Math.pow(this.coinX-x, 2) + Math.pow(this.coinY-y, 2));
         if (diff <= 6) {
           this.cs.setCoinCollected();
           const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
@@ -111,26 +117,28 @@ export class GameComponent implements OnInit {
   }
 
   move(ctx, dir: string, id: number): void {
+    const x = this.locations.get(id)[0].x;
+    const y = this.locations.get(id)[0].y;
     if (dir === "up") {
-      if (this.y - this.stringLength - this.velocity > 0) {
+      if (y - this.stringLength - this.velocity > 0) {
         this.drawNewLine(ctx,1, id);
       } else {
         this.drawNewLine(ctx,0, id);
       }
     } else if (dir === "left") {
-      if (this.x - this.stringLength - this.velocity > 0) {
+      if (x - this.stringLength - this.velocity > 0) {
         this.drawNewLine(ctx, 2, id);
       } else {
         this.drawNewLine(ctx,0, id);
       }
     } else if (dir === "down") {
-      if (this.y + this.stringLength + this.velocity < this.height) {
+      if (y + this.stringLength + this.velocity < this.height) {
         this.drawNewLine(ctx, 3, id);
       } else {
         this.drawNewLine(ctx, 0, id);
       }
     } else if (dir === "right") {
-      if (this.x + this.stringLength + this.velocity < this.width) {
+      if (x + this.stringLength + this.velocity < this.width) {
         this.drawNewLine(ctx, 4, id);
       } else {
         this.drawNewLine(ctx,0, id);
@@ -183,6 +191,7 @@ export class GameComponent implements OnInit {
     });
     ctx.strokeStyle = this.cs.getColor();
     ctx.stroke();
+    this.locations.set(id, data);
   }
 
   setOwnDir(dir: string): void {
