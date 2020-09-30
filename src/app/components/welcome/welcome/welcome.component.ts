@@ -33,6 +33,7 @@ export class WelcomeComponent implements OnInit {
 
   createRoom(): void {
     this.cs.createNewRoom(this.snakeSpeed, this.players).subscribe(() => {
+      this.cs.setColor(this.color);
       this.router.navigate(["game"]);
     });
   }
