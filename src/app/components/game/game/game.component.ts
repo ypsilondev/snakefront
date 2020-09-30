@@ -125,7 +125,7 @@ export class GameComponent implements OnInit {
         }
       }
 
-    }, 50);
+    }, 25);
   }
 
   move(ctx, dir: string, id: number): void {
