@@ -155,19 +155,23 @@ export class GameComponent implements OnInit {
     }
     ctx.beginPath();
     let first = true;
+    let second = false;
     this.locations.forEach(loc => {
       if (first) {
         ctx.moveTo(loc.x, loc.y);
         first = false;
       } else {
         ctx.lineTo(loc.x, loc.y);
-        const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
-        if (diff <= this.velocity) {
-          this.cs.setColor("red");
+        if (second) {
+          const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+          if (diff <= this.velocity) {
+            this.cs.setColor("red");
+          }
         }
+        second = true;
       }
     });
-    ctx.strokeColor = this.cs.getColor();
+    ctx.strokeStyle = this.cs.getColor();
     ctx.stroke();
     this.map.forEach((value, key) => {
       ctx.beginPath();
@@ -184,7 +188,7 @@ export class GameComponent implements OnInit {
           this.cs.setColor("red");
         }
       });
-      ctx.strokeColor = value.color;
+      ctx.strokeStyle = value.color;
       ctx.stroke();
     });
     this.cs.sendMovement(this.locations);
