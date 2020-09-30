@@ -109,6 +109,8 @@ export class GameComponent implements OnInit {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
+        console.log(this.locations);
+
         const diff = Math.sqrt(Math.pow(
           this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
           Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
