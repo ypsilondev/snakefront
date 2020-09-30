@@ -191,8 +191,9 @@ export class GameComponent implements OnInit {
         ctx.moveTo(loc.x, loc.y);
       } else {
         ctx.lineTo(loc.x, loc.y);
-        if (i >= 10) {
-          const diff = Math.sqrt(Math.pow(loc.x - data[0].x, 2) + Math.pow(loc.y - data[0].y, 2));
+        if (!(id === this.cs.getId() && i >= 10)) {
+          const diff = Math.sqrt(Math.pow(loc.x - this.locations.get(this.cs.getId())[0].x, 2) +
+            Math.pow(loc.y - this.locations.get(this.cs.getId())[0].y, 2));
           if (diff <= this.velocity) {
             console.log(diff);
             this.cs.setColor("red");
@@ -201,7 +202,7 @@ export class GameComponent implements OnInit {
       }
       i++;
     });
-    ctx.strokeStyle = this.cs.getColor();
+    ctx.strokeStyle = this.map.get(id).color;
     ctx.stroke();
     this.locations.set(id, data);
   }
