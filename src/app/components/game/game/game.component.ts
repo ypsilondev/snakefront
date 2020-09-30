@@ -71,6 +71,8 @@ export class GameComponent implements OnInit {
         this.increaseLength.set(game.payload.id, 0);
       } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
         this.increaseLength.set(game.payload.id, game.payload.value);
+      } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
+        this.locations.set(game.payload.id, game.payload.data);
       }
     });
     this.cs.subscribeMovements().subscribe(movements => {
@@ -90,7 +92,9 @@ export class GameComponent implements OnInit {
       }
     });
 
+    let frameCount = 0;
     setInterval(() => {
+      frameCount++;
       if (!this.preRunning && !this.ifCountdown) {
         ctx.clearRect(0, 0, this.width, this.height);
         ctx.beginPath();
@@ -112,6 +116,10 @@ export class GameComponent implements OnInit {
           this.move(ctx, value.positions, key);
         });
       }
+      if (frameCount%60 === 0) {
+        this.cs.sendPosition(this.locations.get(this.cs.getId()));
+      }
+
     }, 17);
   }
 
