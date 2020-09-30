@@ -88,6 +88,7 @@ export class ConnectionService {
   private registerChannels(): void {
     const self = this;
     this.socket.fromEvent("register").subscribe((resp: {event, roomCode, state, code, id, roomSettings: {velocity, players}}) => {
+      console.log(resp);
       if(resp.code >= 10 && resp.code < 20) {
         self.roomCode = resp.roomCode;
         self.id = resp.id;

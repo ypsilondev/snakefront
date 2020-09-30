@@ -20,6 +20,7 @@ export class GameComponent implements OnInit {
   private increaseLength = new Map<number, number>();
   private map = new Map<number, {color: string, positions: string}>();
   private locations = new Map<number, [{x: number, y: number}]>();
+  private isNotSubscribed = true;
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
@@ -40,46 +41,50 @@ export class GameComponent implements OnInit {
     ctx.strokeStyle = 'white';
 
     this.velocity = this.cs.getVelocity();
-    this.cs.subscribeGame().subscribe(game => {
-      console.log(game);
-      if (game.message === "Game Full") {
-        this.cs.sendCord(x, y);
-        this.preRunning = false;
-      } else if (game.message === "Coin generated") {
-        this.coinX = game.payload.x;
-        this.coinY = game.payload.y;
-      } else if (game.message === "start Countdown") {
-        this.ifCountdown = true;
-        setTimeout(() => {
-          this.countdown--;
+    if (this.isNotSubscribed) {
+      this.isNotSubscribed = false;
+      this.cs.subscribeGame().subscribe(game => {
+        if (game.message === "Game Full") {
+          console.log(game);
+          this.cs.sendCord(x, y);
+          this.preRunning = false;
+        } else if (game.message === "Coin generated") {
+          this.coinX = game.payload.x;
+          this.coinY = game.payload.y;
+        } else if (game.message === "start Countdown") {
+          this.ifCountdown = true;
           setTimeout(() => {
             this.countdown--;
-            this.locations.forEach((value, key) => {
-              for (let i = 0; i < this.stringLength / this.velocity; i++) {
-                value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
-              }
-            });
             setTimeout(() => {
               this.countdown--;
-              this.ifCountdown = false;
+              console.log(this.locations);
+              this.locations.forEach((value, key) => {
+                for (let i = 0; i < this.stringLength / this.velocity; i++) {
+                  value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
+                }
+              });
+              setTimeout(() => {
+                this.countdown--;
+                this.ifCountdown = false;
+              }, 1000);
             }, 1000);
           }, 1000);
-        }, 1000);
-      } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
-        console.log(game);
-        this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
-        this.increaseLength.set(game.payload.id, 0);
-      } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
-        this.increaseLength.set(game.payload.id, game.payload.value);
-      } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
-        this.locations.set(game.payload.id, game.payload.data);
-      }
-    });
-    this.cs.subscribeMovements().subscribe(movements => {
-      if (movements.id !== this.cs.getId()) {
-        this.map.set(movements.id, movements.payload);
-      }
-    });
+        } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
+          console.log(game);
+          this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
+          this.increaseLength.set(game.payload.id, 0);
+        } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
+          this.increaseLength.set(game.payload.id, game.payload.value);
+        } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
+          this.locations.set(game.payload.id, game.payload.data);
+        }
+      });
+      this.cs.subscribeMovements().subscribe(movements => {
+        if (movements.id !== this.cs.getId()) {
+          this.map.set(movements.id, movements.payload);
+        }
+      });
+    }
 
     document.addEventListener("keydown", e => {
       if (!this.preRunning && !this.ifCountdown) {
