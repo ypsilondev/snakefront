@@ -10,8 +10,8 @@ import {Router} from '@angular/router';
 export class GameComponent implements OnInit {
   private width = 1400;
   private height = 800;
-  private x = Math.random() * this.width;
-  private y = Math.random() * this.height;
+  // private x = Math.random() * this.width;
+  // private y = Math.random() * this.height;
   private stringLength = 10;
   private velocity = 2;
   preRunning = true;
@@ -32,8 +32,11 @@ export class GameComponent implements OnInit {
       this.router.navigate([""]);
     }
 
+    const y = Math.random() * this.height;
+    const x = Math.random() * this.width;
+
     this.map.set(this.cs.getId(), {color: this.cs.getColor(), positions: "down"});
-    this.locations.set(this.cs.getId(), [{x: this.x, y: this.y}]);
+    this.locations.set(this.cs.getId(), [{x, y}]);
     this.increaseLength.set(this.cs.getId(), 0);
 
     const snake = document.getElementById('snake') as HTMLCanvasElement;
@@ -44,7 +47,7 @@ export class GameComponent implements OnInit {
     this.cs.subscribeGame().subscribe(game => {
       console.log(game);
       if (game.message === "Game Full") {
-        this.cs.sendCord(this.x, this.y);
+        this.cs.sendCord(x, y);
         this.preRunning = false;
       } else if (game.message === "Coin generated") {
         this.coinX = game.payload.x;
@@ -99,10 +102,10 @@ export class GameComponent implements OnInit {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        const x = this.locations.get(this.cs.getId())[0].x;
-        const y = this.locations.get(this.cs.getId())[0].y;
-
-        const diff = Math.sqrt(Math.pow(this.coinX-x, 2) + Math.pow(this.coinY-y, 2));
+        const diff = Math.sqrt(Math.pow(
+          this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
+          Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
+        );
         if (diff <= 6) {
           this.cs.setCoinCollected();
           const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
@@ -180,9 +183,10 @@ export class GameComponent implements OnInit {
         ctx.moveTo(loc.x, loc.y);
       } else {
         ctx.lineTo(loc.x, loc.y);
-        if (i >= 5) {
-          const diff = Math.sqrt(Math.pow(loc.x - this.x, 2) + Math.pow(loc.y - this.y, 2));
+        if (i >= 10) {
+          const diff = Math.sqrt(Math.pow(loc.x - data[0].x, 2) + Math.pow(loc.y - data[0].y, 2));
           if (diff <= this.velocity) {
+            console.log(diff);
             this.cs.setColor("red");
           }
         }
