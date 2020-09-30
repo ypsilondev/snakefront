@@ -49,6 +49,7 @@ export class GameComponent implements OnInit {
           this.cs.sendCord(x, y);
           this.preRunning = false;
         } else if (game.message === "Coin generated") {
+          console.log(game);
           this.coinX = game.payload.x;
           this.coinY = game.payload.y;
         } else if (game.message === "start Countdown") {
@@ -57,7 +58,6 @@ export class GameComponent implements OnInit {
             this.countdown--;
             setTimeout(() => {
               this.countdown--;
-              console.log(this.locations);
               this.locations.forEach((value, key) => {
                 for (let i = 0; i < this.stringLength / this.velocity; i++) {
                   value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
@@ -70,7 +70,6 @@ export class GameComponent implements OnInit {
             }, 1000);
           }, 1000);
         } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
-          console.log(game);
           this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
           this.increaseLength.set(game.payload.id, 0);
         } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {

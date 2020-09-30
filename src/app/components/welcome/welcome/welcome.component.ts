@@ -18,6 +18,7 @@ export class WelcomeComponent implements OnInit {
   constructor(public ss: SettingsService, public cs: ConnectionService, private router: Router) { }
 
   ngOnInit(): void {
+    this.cs.registerChannels();
   }
 
   submitCode(): void {

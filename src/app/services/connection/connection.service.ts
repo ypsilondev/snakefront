@@ -16,7 +16,7 @@ export class ConnectionService {
   private color = "white";
 
   constructor(private socket: Socket) {
-    this.registerChannels();
+
   }
 
   public getRoomCode(): string {
@@ -85,7 +85,7 @@ export class ConnectionService {
     this.socket.emit("game", {message: "startCord", payload: {x, y, id: this.id}});
   }
 
-  private registerChannels(): void {
+  public registerChannels(): void {
     const self = this;
     this.socket.fromEvent("register").subscribe((resp: {event, roomCode, state, code, id, roomSettings: {velocity, players}}) => {
       console.log(resp);
