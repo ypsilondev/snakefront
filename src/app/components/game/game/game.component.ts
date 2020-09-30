@@ -85,6 +85,7 @@ export class GameComponent implements OnInit {
         ctx.clearRect(0, 0, this.width, this.height);
         ctx.beginPath();
         ctx.arc(this.coinX, this.coinY, 6, 0, Math.PI * 2);
+        ctx.strokeStyle = "white";
         ctx.stroke();
 
         const diff = Math.sqrt(Math.pow(this.coinX-this.x, 2) + Math.pow(this.coinY-this.y, 2));
