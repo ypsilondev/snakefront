@@ -8,8 +8,11 @@ import { Component, OnInit } from '@angular/core';
 export class GameComponent implements OnInit {
   private width = 1400;
   private height = 800;
-  private coins = [];
-  private startPositions = [];
+  private direction = "";
+  private x = Math.random() * this.width;
+  private y = Math.random() * this.height;
+  private stringLength = 10;
+  private velocity = 3;
 
   constructor() { }
 
@@ -18,61 +21,65 @@ export class GameComponent implements OnInit {
     const ctx = snake.getContext('2d');
     ctx.strokeStyle = 'white';
 
-    // First coins
-    for (let i = 0; i<2; i++) {
-      const coinRadius = 5;
-      const ranX = Math.random() * (this.width - coinRadius);   // width - radius
-      const ranY = Math.random() * (this.height - coinRadius);  // height - radius
-      ctx.beginPath();
-      ctx.arc(ranX, ranY, coinRadius, 0, Math.PI * 2);
-      this.coins.push({x: ranX, y: ranY});
-      ctx.stroke();
-    }
-
-    // Players
-    for (let i = 0; i<2; i++) {
-      const initialLength = 10;
-      const ranX = Math.random() * (this.width - initialLength);
-      const ranY = Math.random() * (this.height - initialLength);
-      ctx.moveTo(ranX, ranY);
-      ctx.lineTo(ranX+initialLength, ranY);
-      this.startPositions.push({x: ranX, y: ranY, length: initialLength});
-      ctx.stroke();
-    }
+    document.addEventListener("keydown", e => {
+      switch (e.key) {
+        case "ArrowUp": this.direction = "up"; break;
+        case "ArrowLeft": this.direction = "left"; break;
+        case "ArrowDown": this.direction = "down"; break;
+        case "ArrowRight": this.direction = "right"; break;
+      }
+    });
 
     setInterval(() => {
       ctx.clearRect(0, 0, this.width, this.height);
-      ctx.clearRect(0, 0, this.width, this.height);
-      const newPositions = [];
-      for (let i = 0; i<2; i++) {
-        const startX = this.startPositions[i].x;
-        const startY = this.startPositions[i].y;
-        const length = this.startPositions[i].length;
-
-        // Nach rechts:
-        if (startX + length < this.width) {
-          ctx.beginPath();
-          ctx.moveTo(startX + 1, startY);
-          ctx.lineTo(startX + 1 + this.startPositions[i].length, startY);
-          newPositions.push({x: (startX + 1), y: startY, length});
-          ctx.stroke();
-        } else {
-          ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(startX + this.startPositions[i].length, startY);
-          newPositions.push({x: startX, y: startY, length});
-          ctx.stroke();
-        }
-      }
-      this.startPositions = newPositions;
+      this.move(ctx, this.direction);
     }, 17);
   }
 
-  move(event: KeyboardEvent): void {
-    console.log("unnddd");
-    if (event.key === "ARROW UP") {
-      console.log("Aa");
+  move(ctx, dir: string): void {
+    if (dir === "up") {
+      if (this.y - this.stringLength - this.velocity > 0) {
+        this.drawNewLine(ctx, this.x, this.y-this.velocity, true);
+        this.y = this.y - this.velocity;
+      } else {
+        this.drawNewLine(ctx, this.x, this.y, true);
+      }
+    } else if (dir === "left") {
+      if (this.x - this.stringLength - this.velocity > 0) {
+        this.drawNewLine(ctx, this.x-this.velocity, this.y, false);
+        this.x = this.x - this.velocity;
+      } else {
+        this.drawNewLine(ctx, this.x, this.y, false);
+      }
+    } else if (dir === "down") {
+      if (this.y + this.stringLength + this.velocity < this.height) {
+        this.drawNewLine(ctx, this.x, this.y+this.velocity, true);
+        this.y = this.y + this.velocity;
+      } else {
+        this.drawNewLine(ctx, this.x, this.y, true);
+      }
+    } else if (dir === "right") {
+      if (this.x + this.stringLength + this.velocity < this.width) {
+        this.drawNewLine(ctx, this.x+this.velocity, this.y, false);
+        this.x = this.x + this.velocity;
+      } else {
+        this.drawNewLine(ctx, this.x, this.y, false);
+      }
+    } else {
+      this.drawNewLine(ctx, this.x, this.y, false);
     }
+    // todo: Send to Backend
+  }
+
+  drawNewLine(ctx, x: number, y: number, upDown: boolean): void {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    if (upDown) {
+      ctx.lineTo(x, y+ this.stringLength);
+    } else {
+      ctx.lineTo(x + this.stringLength, y);
+    }
+    ctx.stroke();
   }
 
 }
