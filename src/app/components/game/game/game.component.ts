@@ -8,8 +8,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnInit {
-  static count = 0;
-
+  winner = "";
   private width = 1400;
   private height = 800;
   private stringLength = 10;
@@ -22,6 +21,7 @@ export class GameComponent implements OnInit {
   private increaseLength = new Map<number, number>();
   private map = new Map<number, {color: string, positions: string}>();
   private locations = new Map<number, [{x: number, y: number}]>();
+  private isAlive = true;
 
   constructor(public cs: ConnectionService, private router: Router) { }
 
@@ -72,6 +72,8 @@ export class GameComponent implements OnInit {
         this.increaseLength.set(game.payload.id, game.payload.value);
       } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
         this.locations.set(game.payload.id, game.payload.data);
+      } else if (game.message === "winner") {
+        this.winner = game.payload.id;
       }
     });
     this.cs.subscribeMovements().subscribe(movements => {
@@ -93,7 +95,7 @@ export class GameComponent implements OnInit {
 
     let frameCount = 0;
     setInterval(() => {
-      if (!this.preRunning && !this.ifCountdown) {
+      if (!this.preRunning && !this.ifCountdown && this.winner === "") {
         frameCount++;
         ctx.clearRect(0, 0, this.width, this.height);
         ctx.beginPath();
@@ -101,20 +103,24 @@ export class GameComponent implements OnInit {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        const diff = Math.sqrt(Math.pow(
-          this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
-          Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
-        );
-        if (diff <= 6) {
-          this.cs.setCoinCollected();
-          const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
-          this.increaseLength.set(this.cs.getId(), tmp);
-          this.cs.sendIncLength(tmp);
+        if (this.isAlive) {
+          const diff = Math.sqrt(Math.pow(
+            this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
+            Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
+          );
+          if (diff <= 6) {
+            this.cs.setCoinCollected();
+            const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
+            this.increaseLength.set(this.cs.getId(), tmp);
+            this.cs.sendIncLength(tmp);
+          }
         }
         this.map.forEach((value, key) => {
-          this.move(ctx, value.positions, key);
+          if (!(!this.isAlive && this.cs.getId() === key)) {
+            this.move(ctx, value.positions, key);
+          }
         });
-        if (frameCount%60 === 0) {
+        if (frameCount%60 === 0 && this.isAlive) {
           this.cs.sendPosition(this.locations.get(this.cs.getId()));
         }
       }
@@ -212,6 +218,8 @@ export class GameComponent implements OnInit {
           if (diff <= this.velocity) {
             const entry = this.map.get(this.cs.getId());
             entry.color = "red";
+            this.cs.imDead();
+            this.isAlive = false;
             this.cs.sendMovement(entry.positions, entry.color);
             this.map.set(this.cs.getId(), entry);
           }
