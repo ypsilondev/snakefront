@@ -45,11 +45,9 @@ export class GameComponent implements OnInit {
     this.velocity = this.cs.getVelocity();
     this.cs.subscribeGame().subscribe(game => {
       if (game.message === "Game Full") {
-        console.log(game);
         this.cs.sendCord(x, y);
         this.preRunning = false;
       } else if (game.message === "Coin generated") {
-        console.log(game);
         this.coinX = game.payload.x;
         this.coinY = game.payload.y;
       } else if (game.message === "start Countdown") {
@@ -68,14 +66,12 @@ export class GameComponent implements OnInit {
               this.countdown--;
               this.ifCountdown = false;}, 1000);}, 1000);}, 1000);
       } else if (game.message === "startCord" && game.payload.id !== this.cs.getId()) {
-        console.log(game);
         this.locations.set(game.payload.id, [{x: game.payload.x, y: game.payload.y}]);
         this.increaseLength.set(game.payload.id, 0);
       } else if (game.message === "incLength" && game.payload.id !== this.cs.getId()) {
         this.increaseLength.set(game.payload.id, game.payload.value);
       } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
         this.locations.set(game.payload.id, game.payload.data);
-        console.log(game);
       }
     });
     this.cs.subscribeMovements().subscribe(movements => {
@@ -105,8 +101,6 @@ export class GameComponent implements OnInit {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        console.log(this.locations);
-
         const diff = Math.sqrt(Math.pow(
           this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
           Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
@@ -132,28 +126,28 @@ export class GameComponent implements OnInit {
     const x = this.locations.get(id)[0].x;
     const y = this.locations.get(id)[0].y;
     if (dir === "up") {
-      if (y - this.stringLength - this.velocity > 0) {
+      if (y - this.velocity > 0) {
         this.drawNewLine(ctx,1, id);
       } else {
-        this.drawNewLine(ctx,0, id);
+        this.drawNewLine(ctx,5, id);
       }
     } else if (dir === "left") {
-      if (x - this.stringLength - this.velocity > 0) {
+      if (x - this.velocity > 0) {
         this.drawNewLine(ctx, 2, id);
       } else {
-        this.drawNewLine(ctx,0, id);
+        this.drawNewLine(ctx,6, id);
       }
     } else if (dir === "down") {
-      if (y + this.stringLength + this.velocity < this.height) {
+      if (y + this.velocity < this.height) {
         this.drawNewLine(ctx, 3, id);
       } else {
-        this.drawNewLine(ctx, 0, id);
+        this.drawNewLine(ctx, 7, id);
       }
     } else if (dir === "right") {
-      if (x + this.stringLength + this.velocity < this.width) {
+      if (x + this.velocity < this.width) {
         this.drawNewLine(ctx, 4, id);
       } else {
-        this.drawNewLine(ctx,0, id);
+        this.drawNewLine(ctx,8, id);
       }
     } else {
       this.drawNewLine(ctx, 0, id);
@@ -176,6 +170,18 @@ export class GameComponent implements OnInit {
       case 4: {
         newLog = {x: data[0].x + this.velocity, y: data[0].y};
       }       break;
+      case 5: {
+        newLog = {x: data[0].x, y: this.height-1};
+      }       break;
+      case 6: {
+        newLog = {x: this.width-1, y: data[0].y};
+      }       break;
+      case 7: {
+        newLog = {x: data[0].x, y: 1};
+      }       break;
+      case 8: {
+        newLog = {x: 1, y: data[0].y};
+      }       break;
     }
     if (upDown !== 0) {
       data.unshift(newLog);
@@ -191,12 +197,19 @@ export class GameComponent implements OnInit {
       if (i === 0) {
         ctx.moveTo(loc.x, loc.y);
       } else {
-        ctx.lineTo(loc.x, loc.y);
+        if (Math.sqrt(Math.pow(loc.x - data[i-1].x, 2)) > (this.velocity + 1) ||
+          Math.sqrt(Math.pow(loc.y - data[i-1].y, 2)) > (this.velocity + 1)) {
+          ctx.strokeStyle = this.map.get(id).color;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(loc.x, loc.y);
+        } else {
+          ctx.lineTo(loc.x, loc.y);
+        }
         if (!(id === this.cs.getId() && i < 10)) {
           const diff = Math.sqrt(Math.pow(loc.x - this.locations.get(this.cs.getId())[0].x, 2) +
             Math.pow(loc.y - this.locations.get(this.cs.getId())[0].y, 2));
           if (diff <= this.velocity) {
-            console.log(diff);
             const entry = this.map.get(this.cs.getId());
             entry.color = "red";
             this.cs.sendMovement(entry.positions, entry.color);
