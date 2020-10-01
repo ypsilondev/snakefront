@@ -75,7 +75,7 @@ export class GameComponent implements OnInit {
       } else if (game.message === "winner") {
         console.log(game);
         ctx.clearRect(0, 0, this.width, this.height);
-        this.winner = "WINNER " + this.map.get(game.payload.id).color;
+        this.winner = ": COLOR " + this.map.get(game.payload.id).color;
       } else if (game.message === "dead") {
         this.locations.delete(game.payload.id);
         this.map.delete(game.payload.id);
