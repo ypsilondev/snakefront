@@ -14,7 +14,7 @@ import {MatButtonModule} from '@angular/material/button';
 import { GameComponent } from './components/game/game/game.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
-const config: SocketIoConfig = { url: 'http://zjuliany.me:3000', options: {} };
+const config: SocketIoConfig = { url: 'https://snake.zjuliany.me', options: {} };
 
 @NgModule({
   declarations: [
