@@ -23,7 +23,7 @@ export class WelcomeComponent implements OnInit {
   submitCode(): void {
     this.cs.setRoomCode(this.roomCode).subscribe(resp => {
       if (resp.code !== 19 && resp.code !== 18) {
-        this.router.navigate(["game"]);
+        this.router.navigate(["color"]);
       } else {
         this.error = true;
       }
