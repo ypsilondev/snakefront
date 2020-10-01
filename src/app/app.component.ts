@@ -11,4 +11,8 @@ export class AppComponent {
   constructor(public con: ConnectionService) {
 
   }
+
+  quit(): void {
+    document.location.reload();
+  }
 }

@@ -6,7 +6,7 @@
     <mat-icon *ngIf="con.getRoomCode() !== ''">content_copy</mat-icon>
   </span>
   <span class="space"></span>
-  <span><mat-icon *ngIf="con.getRoomCode() !== ''" routerLink="">close</mat-icon></span>
+  <span><mat-icon *ngIf="con.getRoomCode() !== ''" (click)="quit()">close</mat-icon></span>
 </mat-toolbar>
 
 <router-outlet></router-outlet>

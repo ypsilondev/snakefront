@@ -16,7 +16,7 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { ColorSelectionComponent } from './components/colorSelection/color-selection/color-selection.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
-const config: SocketIoConfig = { url: 'https://snake.zjuliany.me', options: {} };
+const config: SocketIoConfig = { url: 'https://snake.ypsilon.tech', options: {} };
 
 @NgModule({
   declarations: [

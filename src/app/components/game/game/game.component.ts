@@ -44,7 +44,6 @@ export class GameComponent implements OnInit {
 
     this.velocity = this.cs.getVelocity();
     this.cs.subscribeGame().subscribe(game => {
-      console.log(game);
       if (game.message === "Game Full") {
         this.cs.sendCord(x, y);
         this.preRunning = false;
@@ -73,7 +72,6 @@ export class GameComponent implements OnInit {
       } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
         this.locations.set(game.payload.id, game.payload.data);
       } else if (game.message === "winner") {
-        console.log(game);
         ctx.clearRect(0, 0, this.width, this.height);
         this.winner = ": COLOR " + this.map.get(game.payload.id).color;
       } else if (game.message === "dead") {

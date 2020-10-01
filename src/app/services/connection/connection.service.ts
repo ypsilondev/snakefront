@@ -92,7 +92,6 @@ export class ConnectionService {
   public registerChannels(): void {
     const self = this;
     this.socket.fromEvent("register").subscribe((resp: {event, roomCode, state, code, id, roomSettings: {velocity, players}}) => {
-      console.log(resp);
       if(resp.code >= 10 && resp.code < 20) {
         self.roomCode = resp.roomCode;
         self.id = resp.id;
@@ -103,7 +102,6 @@ export class ConnectionService {
       }
     });
     this.socket.fromEvent("broadcast").subscribe(resp => {
-      console.log(resp);
     });
     this.movement = this.socket.fromEvent("movement");
   }
