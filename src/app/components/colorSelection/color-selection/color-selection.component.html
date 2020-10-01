@@ -1,0 +1,9 @@
+<div id="buttonContainer">
+  <mat-button-toggle-group>
+    <mat-button-toggle *ngFor="let color of colors" (click)="selectedColor = color">{{color}}</mat-button-toggle>
+  </mat-button-toggle-group>
+  <br><br>
+  <button mat-raised-button color="primary" *ngIf="selectedColor !== ''" (click)="submitColor()">Weiter</button>
+  <br>
+  <p style="color: red">{{ error }}</p>
+</div>

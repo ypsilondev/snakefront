@@ -13,6 +13,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatButtonModule} from '@angular/material/button';
 import { GameComponent } from './components/game/game/game.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { ColorSelectionComponent } from './components/colorSelection/color-selection/color-selection.component';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 const config: SocketIoConfig = { url: 'https://snake.zjuliany.me', options: {} };
 
@@ -20,7 +22,8 @@ const config: SocketIoConfig = { url: 'https://snake.zjuliany.me', options: {} }
   declarations: [
     AppComponent,
     WelcomeComponent,
-    GameComponent
+    GameComponent,
+    ColorSelectionComponent
   ],
   imports: [
     BrowserModule,
@@ -32,6 +35,7 @@ const config: SocketIoConfig = { url: 'https://snake.zjuliany.me', options: {} }
     FormsModule,
     MatTabsModule,
     MatButtonModule,
+    MatButtonToggleModule,
     SocketIoModule.forRoot(config)
   ],
   providers: [],

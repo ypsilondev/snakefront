@@ -112,4 +112,12 @@ export class ConnectionService {
     this.socket.emit("game", {message: "coin collected", payload: {}});
   }
 
+  sendSubmitColor(color: string): void {
+    this.socket.emit("room", {message: "setColor", payload: {color}});
+  }
+
+  subscribeRoom(): Observable<{message: string, payload: {success: boolean}}> {
+    return this.socket.fromEvent("room");
+  }
+
 }

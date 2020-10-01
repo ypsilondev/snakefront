@@ -44,6 +44,7 @@ export class GameComponent implements OnInit {
 
     this.velocity = this.cs.getVelocity();
     this.cs.subscribeGame().subscribe(game => {
+      console.log(game);
       if (game.message === "Game Full") {
         this.cs.sendCord(x, y);
         this.preRunning = false;
@@ -57,7 +58,6 @@ export class GameComponent implements OnInit {
           setTimeout(() => {
             this.countdown--;
             this.locations.forEach((value, key) => {
-              console.log(key, value);
               for (let i = 0; i < this.stringLength / this.velocity; i++) {
                 value.push({x: value[0].x, y: value[0].y + this.velocity*(i+1)});
               }
