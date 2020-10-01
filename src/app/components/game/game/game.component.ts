@@ -73,7 +73,11 @@ export class GameComponent implements OnInit {
       } else if (game.message === "posUpdate" && game.payload.id !== this.cs.getId()) {
         this.locations.set(game.payload.id, game.payload.data);
       } else if (game.message === "winner") {
+        console.log(game);
         this.winner = game.payload.id;
+      } else if (game.message === "dead") {
+        this.locations.delete(game.payload.id);
+        this.map.delete(game.payload.id);
       }
     });
     this.cs.subscribeMovements().subscribe(movements => {
@@ -83,7 +87,7 @@ export class GameComponent implements OnInit {
     });
 
     document.addEventListener("keydown", e => {
-      if (!this.preRunning && !this.ifCountdown) {
+      if (!this.preRunning && !this.ifCountdown && this.isAlive) {
         switch (e.key) {
           case "ArrowUp": if (this.map.get(this.cs.getId()).positions !== "down") { this.setOwnDir("up"); } break;
           case "ArrowLeft": if (this.map.get(this.cs.getId()).positions !== "right") { this.setOwnDir("left"); } break;
