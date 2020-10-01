@@ -223,8 +223,7 @@ export class GameComponent implements OnInit {
             entry.color = "red";
             this.cs.imDead();
             this.isAlive = false;
-            this.cs.sendMovement(entry.positions, entry.color);
-            this.map.set(this.cs.getId(), entry);
+            this.map.delete(id);
           }
         }
       }

@@ -15,4 +15,11 @@ export class AppComponent {
   quit(): void {
     document.location.reload();
   }
+
+  copy(): void {
+    const codePlain = document.getElementById("copy");
+    // @ts-ignore
+    //codePlain.select();
+    document.execCommand("copy");
+  }
 }
