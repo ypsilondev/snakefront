@@ -35,7 +35,6 @@ export class ColorSelectionComponent implements OnInit {
   submitColor(): void {
     this.cs.sendSubmitColor(this.selectedColor);
     this.cs.subscribeRoom().subscribe(room => {
-      console.log(room);
       if (room.payload.success) {
         this.cs.setColor(this.selectedColor);
         this.router.navigate(["game"]);
