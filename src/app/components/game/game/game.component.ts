@@ -98,37 +98,40 @@ export class GameComponent implements OnInit {
 
     let frameCount = 0;
     setInterval(() => {
-      if (!this.preRunning && !this.ifCountdown && this.winner === "") {
-        frameCount++;
-        ctx.clearRect(0, 0, this.width, this.height);
-        ctx.beginPath();
-        ctx.arc(this.coinX, this.coinY, 6, 0, Math.PI * 2);
-        ctx.strokeStyle = "white";
-        ctx.stroke();
+      this.intervalMethods(frameCount, ctx);
+    }, 25);
+  }
 
-        if (this.isAlive) {
-          const diff = Math.sqrt(Math.pow(
-            this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
-            Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
-          );
-          if (diff <= 6) {
-            this.cs.setCoinCollected();
-            const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
-            this.increaseLength.set(this.cs.getId(), tmp);
-            this.cs.sendIncLength(tmp);
-          }
-        }
-        this.map.forEach((value, key) => {
-          if (!(!this.isAlive && this.cs.getId() === key)) {
-            this.move(ctx, value.positions, key);
-          }
-        });
-        if (frameCount%60 === 0 && this.isAlive) {
-          this.cs.sendPosition(this.locations.get(this.cs.getId()));
+  async intervalMethods(frameCount, ctx) {
+    if (!this.preRunning && !this.ifCountdown && this.winner === "") {
+      frameCount++;
+      ctx.clearRect(0, 0, this.width, this.height);
+      ctx.beginPath();
+      ctx.arc(this.coinX, this.coinY, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = "white";
+      ctx.stroke();
+
+      if (this.isAlive) {
+        const diff = Math.sqrt(Math.pow(
+          this.coinX-this.locations.get(this.cs.getId())[0].x, 2) +
+          Math.pow(this.coinY-this.locations.get(this.cs.getId())[0].y, 2)
+        );
+        if (diff <= 6) {
+          this.cs.setCoinCollected();
+          const tmp = this.increaseLength.get(this.cs.getId())+(this.stringLength / this.velocity);
+          this.increaseLength.set(this.cs.getId(), tmp);
+          this.cs.sendIncLength(tmp);
         }
       }
-
-    }, 25);
+      this.map.forEach((value, key) => {
+        if (!(!this.isAlive && this.cs.getId() === key)) {
+          this.move(ctx, value.positions, key);
+        }
+      });
+      if (frameCount%60 === 0 && this.isAlive) {
+        this.cs.sendPosition(this.locations.get(this.cs.getId()));
+      }
+    }
   }
 
   move(ctx, dir: string, id: number): void {
