@@ -77,6 +77,10 @@ export class ConnectionService {
     return this.players;
   }
 
+  imDead(): void {
+    this.socket.emit("game", {message: "Im dead", payload: {}});
+  }
+
   sendPosition(data: [{ x: number; y: number }]): void {
     this.socket.emit("game", {message: "posUpdate", payload: {id: this.id, data}});
   }
